@@ -15,7 +15,7 @@ namespace latestfootasylumtest
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new CheckoutRoutine("https://www.footasylum.com/page/xt_orderform_additem/?target=basket&sku=", "4033293", "15", "morganicfruit@gmail.com", "Penguin1"));
+            Application.Run(new CheckoutRoutine("https://www.footasylum.com/page/xt_orderform_additem/?target=basket&sku=", "4033756", "7", "morganicfruit@gmail.com", "Penguin1"));
         }
     }
 }

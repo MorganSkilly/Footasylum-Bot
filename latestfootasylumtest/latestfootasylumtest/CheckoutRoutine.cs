@@ -14,13 +14,39 @@ using System.Configuration;
 
 namespace latestfootasylumtest
 {
+    public enum Size
+    {
+        three = 1,
+        four = 3,
+        five = 5,
+        six = 7,
+        seven = 9,
+        eight = 11,
+        nine = 13,
+        ten = 15,
+        eleven = 17,
+        twelve = 19,
+        thirteen = 21,
+
+        threeandhalf = 2,
+        fourandhalf = 4,
+        fiveandhalf = 6,
+        sixandhalf = 8,
+        sevenandhalf = 10,
+        eightandhalf = 12,
+        nineandhalf = 14,
+        tenandhalf = 16,
+        elevenandhalf = 18,
+        twelveandhalf = 20,
+        thirteenandhalf = 22,
+    }
+
     public partial class CheckoutRoutine : Form
     {        
         string footasylumATClink, stylecode, sizecode, email, password, productname, productimg;
         bool autoEnabled = true;
 
-        DateTime localDate;
-        
+        DateTime localDate;      
 
         private void Kill_Click(object sender, EventArgs e)
         {
@@ -57,6 +83,11 @@ namespace latestfootasylumtest
         private void reload_Click(object sender, EventArgs e)
         {
             chromeBrowser.Reload(true);
+        }
+
+        private void CheckoutRoutine_Load(object sender, EventArgs e)
+        {
+
         }
 
         public CheckoutRoutine(string footasylumATClink, string stylecode, string sizecode, string email, string password)
@@ -158,31 +189,29 @@ namespace latestfootasylumtest
                             DiscordBot checkoutlink = new DiscordBot("https://discordapp.com/api/webhooks/686768082429149186/p8KqcdkS3gRasGPZXYCwbdg74-nlkX0zX8mLCQwwvNy4BKt5K8vRTjOTn3ldkm16eEoH", "Footasylum Checkout", "http://morgan.games/kraken/krakenbeta.png");
 
                             DiscordEmbedField style = new DiscordEmbedField(productname, stylecode);
-                            DiscordEmbedField size = new DiscordEmbedField("Size code " + sizecode, "Size " + "Unknown");
+                            DiscordEmbedField size = new DiscordEmbedField("Size code " + sizecode, "Size " + CheckGSSize(int.Parse(sizecode)));
                             DiscordEmbedField details = new DiscordEmbedField("Task took " + diff.Seconds + " seconds", "Checkout Now!");
                             DiscordEmbedField cart = new DiscordEmbedField("Checkout Link", "[Checkout Page](" + currentAddress + ")");
 
                             checkoutlink.SendDiscordWebHookEmbeded(
                                         productimg,
-                                        "This is a test",
+                                        "Kraken x Footasylum Checkout Link",
                                         currentAddress,
                                         style,
                                         size,
                                         details,
                                         cart);
                             sentwebhook = true;
-                            SetText("sending discord webhook");
+                            SetText("sending discord webhook");                                                        
+                        }
 
-                            script = @"
+                        script = @"
                             setTimeout(() => {  document.querySelector('#payPalButton').click(); }, 1000);
                             setTimeout(() => {  window.scrollTo(0, document.body.scrollHeight); }, 1000);
                         
 ";
-                            chromeBrowser.ExecuteScriptAsyncWhenPageLoaded(script);
-                            SetText("trying to checkout with paypal");
-                        }
-
-
+                        chromeBrowser.ExecuteScriptAsyncWhenPageLoaded(script);
+                        SetText("trying to checkout with paypal");
 
 
                         this.Invoke((MethodInvoker)delegate
@@ -207,7 +236,7 @@ namespace latestfootasylumtest
         {
             CefSettings settings = new CefSettings();
             // Initialize cef with the provided settings
-            settings.CachePath = AppDomain.CurrentDomain.BaseDirectory + "cache";
+            settings.CachePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\CEF";
 
             Cef.Initialize(settings);
             // Create a browser component
@@ -243,6 +272,84 @@ namespace latestfootasylumtest
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             Cef.Shutdown();
+        }
+
+        private string CheckGSSize(int code)
+        {
+            string checkedsize = "null";
+
+            if (code == 2)
+                checkedsize = "3";
+            else if (code == 3)
+                checkedsize = "3.5";
+            else if (code == 4)
+                checkedsize = "4";
+            else if (code == 5)
+                checkedsize = "4.5";
+            else if (code == 6)
+                checkedsize = "5";
+            else if (code == 7)
+                checkedsize = "5.5";
+            else if (code == 8)
+                checkedsize = "6";
+
+            return checkedsize;
+        }
+
+        private string CheckSize(int code)
+        {
+            string checkedsize = "null";
+
+            if (code == 1)
+                checkedsize = "3";
+            else if (code == 2)
+                checkedsize = "3.5";
+            else if (code == 3)
+                checkedsize = "4";
+            else if (code == 4)
+                checkedsize = "4.5";
+            else if (code == 5)
+                checkedsize = "5";
+            else if (code == 6)
+                checkedsize = "5.5";
+            else if (code == 7)
+                checkedsize = "6";
+            else if (code == 8)
+                checkedsize = "6.5";
+            else if (code == 9)
+                checkedsize = "7";
+            else if (code == 10)
+                checkedsize = "7.5";
+            else if (code == 11)
+                checkedsize = "8";
+            else if (code == 12)
+                checkedsize = "8.5";
+            else if (code == 13)
+                checkedsize = "9";
+            else if (code == 14)
+                checkedsize = "9.5";
+            else if (code == 15)
+                checkedsize = "10";
+            else if (code == 16)
+                checkedsize = "10.5";
+            else if (code == 17)
+                checkedsize = "11";
+            else if (code == 18)
+                checkedsize = "11.5";
+            else if (code == 19)
+                checkedsize = "12";
+            else if (code == 20)
+                checkedsize = "12.5";
+            else if (code == 21)
+                checkedsize = "13";
+            else if (code == 22)
+                checkedsize = "13.5";
+            else if (code == 23)
+                checkedsize = "14";
+            else if (code == 24)
+                checkedsize = "14.5";
+
+            return checkedsize;
         }
     }
 

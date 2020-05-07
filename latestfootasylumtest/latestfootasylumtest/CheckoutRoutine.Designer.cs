@@ -30,6 +30,7 @@
         {
             this.Status = new System.Windows.Forms.RichTextBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.reload = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.Stop = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -39,7 +40,6 @@
             this.CCNum = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.Kill = new System.Windows.Forms.Button();
-            this.reload = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
@@ -67,6 +67,18 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(313, 288);
             this.panel1.TabIndex = 5;
+            // 
+            // reload
+            // 
+            this.reload.BackColor = System.Drawing.Color.SteelBlue;
+            this.reload.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.reload.Location = new System.Drawing.Point(103, 195);
+            this.reload.Name = "reload";
+            this.reload.Size = new System.Drawing.Size(44, 57);
+            this.reload.TabIndex = 12;
+            this.reload.Text = "F5";
+            this.reload.UseVisualStyleBackColor = false;
+            this.reload.Click += new System.EventHandler(this.reload_Click);
             // 
             // label2
             // 
@@ -163,18 +175,6 @@
             this.Kill.UseVisualStyleBackColor = false;
             this.Kill.Click += new System.EventHandler(this.Kill_Click);
             // 
-            // reload
-            // 
-            this.reload.BackColor = System.Drawing.Color.SteelBlue;
-            this.reload.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.reload.Location = new System.Drawing.Point(103, 195);
-            this.reload.Name = "reload";
-            this.reload.Size = new System.Drawing.Size(44, 57);
-            this.reload.TabIndex = 12;
-            this.reload.Text = "F5";
-            this.reload.UseVisualStyleBackColor = false;
-            this.reload.Click += new System.EventHandler(this.reload_Click);
-            // 
             // CheckoutRoutine
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -183,6 +183,7 @@
             this.Controls.Add(this.panel1);
             this.Name = "CheckoutRoutine";
             this.Text = "Kraken x Footasylum Checkout Routine";
+            this.Load += new System.EventHandler(this.CheckoutRoutine_Load);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
