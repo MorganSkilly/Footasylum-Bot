@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
 using System.Windows.Forms;
 using CefSharp;
 using CefSharp.WinForms;
 using System.Configuration;
+using System.IO;
+using System.Reflection;
+using System.Media;
 
 namespace latestfootasylumtest
 {
@@ -100,6 +95,7 @@ namespace latestfootasylumtest
             this.password = sizecode;
 
             bool carted = false;
+            bool loggedin = false;
 
             InitializeComponent();
             InitializeChromium();
@@ -117,7 +113,28 @@ namespace latestfootasylumtest
                 if (autoEnabled)
                 {                    
                     Console.WriteLine(currentAddress);
-                    
+
+                    var oosscript = "document.querySelector('#container > div > div > div.plr3.align-center.nogpas > div').textContent";                    
+                    string oosoutput = null;
+                    oosoutput = await chromeBrowser.GetMainFrame().EvaluateScriptAsync(oosscript, new TimeSpan(0, 0, 5).ToString())
+.ContinueWith(t =>
+{
+    var result = t.Result;
+    if (result.Result == null)
+        return "unable to pull HTML";
+    else
+        return result.Result.ToString();
+});
+
+                    SetText(oosoutput);
+
+                    if (oosoutput.Contains("bag is currently empty"))
+                    {
+                        oosoutput = "RESET";
+                        chromeBrowser.Load(footasylumATClink + stylecode + sizecode);
+                    }
+                    else
+                    {
                     if (!carted)
                     {
                         carted = true;
@@ -171,39 +188,50 @@ namespace latestfootasylumtest
                         chromeBrowser.ExecuteScriptAsyncWhenPageLoaded(script);
 
                         SetText("checking out");
-
-                        sentwebhook = false;
                     }
                     else if (currentAddress.Contains("https://secure.footasylum.com/"))
                     {
-                        var script = @"
+                        var script = "document.querySelector('#root > div > div.row.text-center.border-none.mobile-header.seven-header > div.col-sm-4.col-sm-offset-4.col-md-4.col-md-offset-4 > img').click()";
+                        if (!loggedin)
+                        {
+                            loggedin = true;
+                        }
+                        else
+                        {
+                            script = @"
                             document.getElementById('customer_Email').click();document.getElementById('customer_Email').value = '" + email + "';";
+
+                            TimeSpan diff = DateTime.Now.Subtract(localDate);
+                            SetText("processed in " + diff.Seconds + " seconds");
+
+                            if (!sentwebhook)
+                            {
+
+                                sentwebhook = true;
+                                Invoke((MethodInvoker)delegate { Alert(); });
+
+                                DiscordBot checkoutlink = new DiscordBot(ConfigurationManager.AppSettings["discordwebhook"], "Footasylum Checkout", "http://morgan.games/kraken/krakenbeta.png");
+
+                                DiscordEmbedField style = new DiscordEmbedField(productname, stylecode);
+                                DiscordEmbedField size = new DiscordEmbedField("Size code " + sizecode, "Size " + CheckGSSize(int.Parse(sizecode)));
+                                DiscordEmbedField details = new DiscordEmbedField("Task took " + diff.Seconds + " seconds", "Checkout Now!");
+                                DiscordEmbedField cart = new DiscordEmbedField("Checkout Link", "[Checkout Page](" + currentAddress + ")");
+
+                                checkoutlink.SendDiscordWebHookEmbeded(
+                                            productimg,
+                                            "Kraken x Footasylum Checkout Link",
+                                            currentAddress,
+                                            style,
+                                            size,
+                                            details,
+                                            cart);
+                                SetText("sending discord webhook");
+                            }
+                        }                                             
 
                         chromeBrowser.ExecuteScriptAsyncWhenPageLoaded(script);
 
-                        TimeSpan diff = DateTime.Now.Subtract(localDate);
-                        SetText("processed in " + diff.Seconds + " seconds");
-
-                        if (!sentwebhook)
-                        {
-                            DiscordBot checkoutlink = new DiscordBot("https://discordapp.com/api/webhooks/686768082429149186/p8KqcdkS3gRasGPZXYCwbdg74-nlkX0zX8mLCQwwvNy4BKt5K8vRTjOTn3ldkm16eEoH", "Footasylum Checkout", "http://morgan.games/kraken/krakenbeta.png");
-
-                            DiscordEmbedField style = new DiscordEmbedField(productname, stylecode);
-                            DiscordEmbedField size = new DiscordEmbedField("Size code " + sizecode, "Size " + CheckGSSize(int.Parse(sizecode)));
-                            DiscordEmbedField details = new DiscordEmbedField("Task took " + diff.Seconds + " seconds", "Checkout Now!");
-                            DiscordEmbedField cart = new DiscordEmbedField("Checkout Link", "[Checkout Page](" + currentAddress + ")");
-
-                            checkoutlink.SendDiscordWebHookEmbeded(
-                                        productimg,
-                                        "Kraken x Footasylum Checkout Link",
-                                        currentAddress,
-                                        style,
-                                        size,
-                                        details,
-                                        cart);
-                            sentwebhook = true;
-                            SetText("sending discord webhook");                                                        
-                        }
+                        
 
                         script = @"
                             setTimeout(() => {  document.querySelector('#payPalButton').click(); }, 1000);
@@ -226,6 +254,8 @@ namespace latestfootasylumtest
                         ";
                         chromeBrowser.ExecuteScriptAsyncWhenPageLoaded(script);
                     }
+
+                    }
                 }
             };
         }
@@ -234,11 +264,6 @@ namespace latestfootasylumtest
 
         public void InitializeChromium()
         {
-            CefSettings settings = new CefSettings();
-            // Initialize cef with the provided settings
-            settings.CachePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\CEF";
-
-            Cef.Initialize(settings);
             // Create a browser component
             chromeBrowser = new ChromiumWebBrowser(footasylumATClink + stylecode + sizecode);
             // Add it to the form and fill it to the form window.
@@ -272,6 +297,16 @@ namespace latestfootasylumtest
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             Cef.Shutdown();
+        }
+
+        private void Alert()
+        {
+            SetText("ALERT");
+            string strExeFilePath = Assembly.GetExecutingAssembly().Location;
+            string strWorkPath = Path.GetDirectoryName(strExeFilePath);
+            SoundPlayer simpleSound = new SoundPlayer(Path.Combine(strWorkPath, "alert.wav"));
+            simpleSound.Play();
+            TopMost = true;
         }
 
         private string CheckGSSize(int code)

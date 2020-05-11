@@ -28,7 +28,7 @@ namespace latestfootasylumtest
 
         public void SendDiscordWebHookSimple(string content)
         {
-            string text = File.ReadAllText("bottest.json");
+            //string text = File.ReadAllText("bottest.json");
 
             webhookData.Set("content", "```" + content + "```" +
                 "http://morgan.games/kraken/krakenbeta.png");
